@@ -22,12 +22,15 @@ const products = productsFromServer.map((product) => {
 export const App = () => {
   const [query, setQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState('All');
+  const [categories, setCategories] = useState([]);
+
   const filteredProducts = products.filter((product) => {
     const formattedQuery = query.toLowerCase();
     const formattedName = product.name.toLowerCase();
 
     return formattedName.includes(formattedQuery)
-      && (product.user.id === selectedUser || selectedUser === 'All');
+      && (product.user.id === selectedUser || selectedUser === 'All')
+      && (categories.includes(product.category.title) || !categories.length);
   });
 
   const [visibleProducts, setVisibleProducts] = useState(filteredProducts);
@@ -37,12 +40,15 @@ export const App = () => {
 
   useEffect(() => {
     setVisibleProducts(filteredProducts);
-  }, [selectedUser, query]);
+  }, [selectedUser, query, categories]);
 
   const resetHandler = () => {
     setSelectedUser('All');
     setQuery('');
   };
+
+  // eslint-disable-next-line no-console
+  console.log(categories);
 
   return (
     <div className="section">
@@ -110,7 +116,9 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
+                className={classNames('button is-success mr-6',
+                  { 'is-outlined': categories.length !== 0 })}
+                onClick={() => setCategories([])}
               >
                 All
               </a>
@@ -120,8 +128,23 @@ export const App = () => {
                   href="#/"
                   key={category.id}
                   className={classNames('button mr-2 my-1',
-                    { 'is-info': category.title })
+                    { 'is-info': categories.includes(category.title) })
                 }
+                  onClick={() => setCategories((state) => {
+                    const stateCopy = [...state];
+                    const index = stateCopy.indexOf(category.title);
+
+                    if (stateCopy.includes(category.title)) {
+                      stateCopy.splice(index, 1);
+                    } else {
+                      return [
+                        ...stateCopy,
+                        category.title,
+                      ];
+                    }
+
+                    return stateCopy;
+                  })}
                 >
                   {category.title}
                 </a>
@@ -133,7 +156,10 @@ export const App = () => {
                 data-cy="ResetAllButton"
                 href="#/"
                 className="button is-link is-outlined is-fullwidth"
-                onClick={resetHandler}
+                onClick={() => {
+                  resetHandler();
+                  setCategories([]);
+                }}
               >
                 Reset all filters
               </a>
