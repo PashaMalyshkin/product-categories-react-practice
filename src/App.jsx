@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.scss';
 
 import classNames from 'classnames';
@@ -20,19 +20,25 @@ const products = productsFromServer.map((product) => {
 });
 
 export const App = () => {
+  const [query, setQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState('All');
-  const [visibleProducts, setVisibleProducts] = useState(products);
+
+  const filteredProducts = products.filter((product) => {
+    const formattedQuery = query.toLowerCase();
+    const formattedName = product.name.toLowerCase();
+
+    return formattedName.includes(formattedQuery)
+      && (product.user.id === selectedUser || selectedUser === 'All');
+  });
+
+  const [visibleProducts, setVisibleProducts] = useState(filteredProducts);
   const handleUserSelect = (userId) => {
     setSelectedUser(userId);
   };
 
   useEffect(() => {
-    const filteredProducts = products.filter(product => (
-      product.user.id === selectedUser || selectedUser === 'All'
-    ));
-
     setVisibleProducts(filteredProducts);
-  }, [selectedUser]);
+  }, [selectedUser, query]);
 
   return (
     <div className="section">
@@ -75,8 +81,8 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
-                  onChange={() => {}}
+                  value={query}
+                  onChange={event => setQuery(event.target.value)}
                 />
 
                 <span className="icon is-left">
@@ -156,55 +162,55 @@ export const App = () => {
             className="table is-striped is-narrow is-fullwidth"
           >
             <thead>
-            <tr>
-              <th>
-                <span className="is-flex is-flex-wrap-nowrap">
-                  ID
+              <tr>
+                <th>
+                  <span className="is-flex is-flex-wrap-nowrap">
+                    ID
 
-                  <a href="#/">
-                    <span className="icon">
-                      <i data-cy="SortIcon" className="fas fa-sort" />
-                    </span>
-                  </a>
-                </span>
-              </th>
+                    <a href="#/">
+                      <span className="icon">
+                        <i data-cy="SortIcon" className="fas fa-sort" />
+                      </span>
+                    </a>
+                  </span>
+                </th>
 
-              <th>
-                <span className="is-flex is-flex-wrap-nowrap">
-                  Product
+                <th>
+                  <span className="is-flex is-flex-wrap-nowrap">
+                    Product
 
-                  <a href="#/">
-                    <span className="icon">
-                      <i data-cy="SortIcon" className="fas fa-sort-down" />
-                    </span>
-                  </a>
-                </span>
-              </th>
+                    <a href="#/">
+                      <span className="icon">
+                        <i data-cy="SortIcon" className="fas fa-sort-down" />
+                      </span>
+                    </a>
+                  </span>
+                </th>
 
-              <th>
-                <span className="is-flex is-flex-wrap-nowrap">
-                  Category
+                <th>
+                  <span className="is-flex is-flex-wrap-nowrap">
+                    Category
 
-                  <a href="#/">
-                    <span className="icon">
-                      <i data-cy="SortIcon" className="fas fa-sort-up" />
-                    </span>
-                  </a>
-                </span>
-              </th>
+                    <a href="#/">
+                      <span className="icon">
+                        <i data-cy="SortIcon" className="fas fa-sort-up" />
+                      </span>
+                    </a>
+                  </span>
+                </th>
 
-              <th>
-                <span className="is-flex is-flex-wrap-nowrap">
-                  User
+                <th>
+                  <span className="is-flex is-flex-wrap-nowrap">
+                    User
 
-                  <a href="#/">
-                    <span className="icon">
-                      <i data-cy="SortIcon" className="fas fa-sort" />
-                    </span>
-                  </a>
-                </span>
-              </th>
-            </tr>
+                    <a href="#/">
+                      <span className="icon">
+                        <i data-cy="SortIcon" className="fas fa-sort" />
+                      </span>
+                    </a>
+                  </span>
+                </th>
+              </tr>
             </thead>
 
             <tbody>
