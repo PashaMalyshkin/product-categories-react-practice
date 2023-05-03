@@ -22,7 +22,6 @@ const products = productsFromServer.map((product) => {
 export const App = () => {
   const [query, setQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState('All');
-
   const filteredProducts = products.filter((product) => {
     const formattedQuery = query.toLowerCase();
     const formattedName = product.name.toLowerCase();
@@ -115,37 +114,18 @@ export const App = () => {
               >
                 All
               </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 4
-              </a>
+              {categoriesFromServer.map(category => (
+                <a
+                  data-cy="Category"
+                  href="#/"
+                  key={category.id}
+                  className={classNames('button mr-2 my-1',
+                    { 'is-info': category.title })
+                }
+                >
+                  {category.title}
+                </a>
+              ))}
             </div>
 
             <div className="panel-block">
@@ -228,7 +208,7 @@ export const App = () => {
 
                     <td data-cy="ProductName">{product.name}</td>
                     {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
-                    <td data-cy="ProductCategory">{`${product.category.icon} ${product.category.title}`}</td>
+                    <td data-cy="ProductCategory">{`${product.category.icon} - ${product.category.title}`}</td>
 
                     <td
                       data-cy="ProductUser"
