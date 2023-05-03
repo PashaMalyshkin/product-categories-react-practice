@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.scss';
 
+import classNames from 'classnames';
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
-import classNames from 'classnames';
 
 const products = productsFromServer.map((product) => {
   const productCategory = categoriesFromServer
@@ -20,6 +20,20 @@ const products = productsFromServer.map((product) => {
 });
 
 export const App = () => {
+  const [selectedUser, setSelectedUser] = useState('All');
+  const [visibleProducts, setVisibleProducts] = useState(products);
+  const handleUserSelect = (userId) => {
+    setSelectedUser(userId);
+  };
+
+  useEffect(() => {
+    const filteredProducts = products.filter(product => (
+      product.user.id === selectedUser || selectedUser === 'All'
+    ));
+
+    setVisibleProducts(filteredProducts);
+  }, [selectedUser]);
+
   return (
     <div className="section">
       <div className="container">
@@ -33,31 +47,25 @@ export const App = () => {
               <a
                 data-cy="FilterAllUsers"
                 href="#/"
+                className={classNames({ 'is-active': selectedUser === 'All' })}
+                onClick={() => handleUserSelect('All')}
               >
                 All
               </a>
 
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 1
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-                className="is-active"
-              >
-                User 2
-              </a>
-
-              <a
-                data-cy="FilterUser"
-                href="#/"
-              >
-                User 3
-              </a>
+              {usersFromServer.map(user => (
+                <a
+                  data-cy="FilterUser"
+                  href="#/"
+                  key={user.id}
+                  className={classNames(
+                    { 'is-active': user.id === selectedUser },
+                  )}
+                  onClick={() => handleUserSelect(user.id)}
+                >
+                  {user.name}
+                </a>
+              ))}
             </p>
 
             <div className="panel-block">
@@ -68,6 +76,7 @@ export const App = () => {
                   className="input"
                   placeholder="Search"
                   value="qwe"
+                  onChange={() => {}}
                 />
 
                 <span className="icon is-left">
@@ -199,10 +208,10 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(product => (
+              {visibleProducts.map(product => (
                 <tr data-cy="Product" key={product.id}>
                   <td className="has-text-weight-bold" data-cy="ProductId">
-                    {product.category.id}
+                    {product.id}
                   </td>
 
                   <td data-cy="ProductName">{product.name}</td>
